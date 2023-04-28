@@ -1,0 +1,42 @@
+name: Release MonoMac
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version'
+        required: true
+
+jobs:
+  release:
+    name: Release
+    runs-on: [ self-hosted, Linux ]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: '6.0.x'
+
+      - name: Add NuGet source (Private Nexus)
+        id: add-nuget-source
+        run: |
+          dotnet nuget remove source Nexus | true
+          dotnet nuget add source ${{ secrets.PRIVATE_NUGET_SOURCE }} \
+            --name Nexus \
+            --username ${{ secrets.PRIVATE_AGENT_NEXUS_USERNAME }} \
+            --password ${{ secrets.PRIVATE_AGENT_NEXUS_PASSWORD }} \
+            --store-password-in-clear-text | true  # When host runner already have, it fails. ignore
+
+      - name: Build
+        run: |
+          dotnet restore
+          dotnet pack -c Release -o pack -p:Version=${{ inputs.version }} src/MonoMac.csproj
+
+      - name: Upload
+        run: |
+          dotnet nuget push pack/*.nupkg \
+            --source ${{ secrets.PRIVATE_NUGET_SOURCE }} \
+            --api-key ${{ secrets.PRIVATE_NUGET_SOURCE_API_KEY }}
+
+      - name: Remove NuGet source (Private Nexus)
+        if: ${{ always() && steps.add-nuget-source.conclusion == 'success' }}
+        run: dotnet nuget remove source Nexus | true

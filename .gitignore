@@ -6,3 +6,9 @@ artifacts/
 *.dll
 src/generated_sources
 .vs
+
+# Jetbrains
+.idea/
+
+# Pack
+pack/
