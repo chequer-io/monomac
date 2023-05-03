@@ -12,6 +12,14 @@ jobs:
     runs-on: [ self-hosted, Linux ]
     steps:
       - uses: actions/checkout@v3
+        
+      - uses: rickstaa/action-create-tag@v1
+        with:
+          tag: ${{ inputs.version }}
+          
+      - name: Show version
+        run: echo '## Release ${{ inputs.version }}' >> $GITHUB_STEP_SUMMARY
+        
       - uses: actions/setup-dotnet@v2
         with:
           dotnet-version: '6.0.x'
