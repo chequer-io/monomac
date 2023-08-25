@@ -63,7 +63,7 @@ jobs:
     - name: Build
       run: |
         dotnet restore
-        dotnet pack -c Release -o pack -p:Version=${{ inputs.version }} src/MonoMac.csproj
+        dotnet build -c Release src/MonoMac.csproj
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
