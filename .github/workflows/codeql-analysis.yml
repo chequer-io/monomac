@@ -22,7 +22,7 @@ on:
 jobs:
   analyze:
     name: Analyze
-    runs-on: [self-hosted, querypie]
+    runs-on: [self-hosted, querypie, macOS]
     permissions:
       actions: read
       contents: read
